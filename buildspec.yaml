@@ -10,6 +10,7 @@ phases:
   pre_build:
     commands:
       - echo "Setting variables..."
+      - aws iam get-role --role-name codebuild-project-3-service-role || echo no role
       - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - REGION=us-east-1
       - echo "ACCOUNT_ID = $ACCOUNT_ID"
