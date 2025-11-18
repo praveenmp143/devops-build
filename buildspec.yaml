@@ -1,28 +1,29 @@
 version: 0.2
 
 phases:
-   install:
-  commands:
-    - echo "Installing OS dependencies..."
-    - yum install -y jq tar gzip
-    - echo "Installing kubectl..."
-    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    - chmod +x kubectl
-    - mv kubectl /usr/local/bin/
-    - kubectl version --client
+  install:
+    commands:
+      - echo "Installing dependencies..."
+      - yum update -y
+      - yum install -y awscli jq
+      - echo "Installing kubectl..."
+      - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      - chmod +x kubectl
+      - mv kubectl /usr/local/bin/
+      - kubectl version --client
 
   pre_build:
     commands:
-      - echo "Setting variables..."
+      - echo "Setting environment variables..."
       - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - REGION=us-east-1
       - REPOSITORY=devops-app
+      - CLUSTER_NAME= confused-folk-dinosaur
       - IMAGE_TAG=$(date +%Y%m%d%H%M)
-      - echo "ACCOUNT_ID = $ACCOUNT_ID"
-      - echo "Logging in to Amazon ECR..."
+      - echo "Logging into ECR..."
       - "aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
       - echo "Updating kubeconfig..."
-      - "aws eks update-kubeconfig --region $REGION --name confused-folk-dinosaur"
+      - "aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME"
 
   build:
     commands:
@@ -34,12 +35,14 @@ phases:
     commands:
       - echo "Pushing Docker image..."
       - "docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPOSITORY:$IMAGE_TAG"
-      - echo "Updating deployment YAML..."
+      - echo "Updating Kubernetes deployment..."
       - "sed -i \"s|IMAGE_PLACEHOLDER|$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPOSITORY:$IMAGE_TAG|g\" eks/deployment.yaml"
+      - echo "Applying Kubernetes manifests..."
       - "kubectl apply -f eks/deployment.yaml"
       - "kubectl apply -f eks/service.yaml"
+      - echo "Deployment completed successfully."
 
 artifacts:
   files:
-    - deployment.yaml
-    - service.yaml
+    - eks/deployment.yaml
+    - eks/service.yaml
