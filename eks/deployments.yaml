@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mind-app
+  labels:
+    app: mind-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mind-app
+  template:
+    metadata:
+      labels:
+        app: mind-app
+    spec:
+      containers:
+      - name: mind-app
+        image: mind-app:latest
+        ports:
+        - containerPort: 80
