@@ -35,8 +35,8 @@ phases:
       - "docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPOSITORY:$IMAGE_TAG"
       - echo "Updating deployment YAML..."
       - "sed -i \"s|IMAGE_PLACEHOLDER|$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPOSITORY:$IMAGE_TAG|g\" deployment.yaml"
-      - "kubectl apply -f deployment.yaml"
-      - "kubectl apply -f service.yaml"
+      - "kubectl apply -f eks/deployment.yaml"
+      - "kubectl apply -f eks/service.yaml"
 
 artifacts:
   files:
