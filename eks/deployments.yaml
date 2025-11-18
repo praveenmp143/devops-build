@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: IMAGE_PLACEHOLDER
+  name: mind-app
   labels:
-    app: IMAGE_PLACEHOLDER
+    app: mind-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: IMAGE_PLACEHOLDER
+      app: mind-app
   template:
     metadata:
       labels:
-        app: IMAGE_PLACEHOLDER
+        app: mind-app
     spec:
       containers:
-      - name: IMAGE_PLACEHOLDER
-        image: IMAGE_PLACEHOLDER:latest
+      - name: mind-app
+        image: IMAGE_PLACEHOLDER
         ports:
         - containerPort: 80
