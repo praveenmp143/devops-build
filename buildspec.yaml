@@ -12,6 +12,8 @@ phases:
       - echo "Logging in to Amazon ECR..."
       - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - REGION=us-east-1
+      - echo "DEBUG ACCOUNT ID: $ACCOUNT_ID"
+      - echo "DEBUG REGION: $REGION"
       - REPOSITORY_NAME=devops-app
       - IMAGE_TAG=$(date +%Y%m%d%H%M)
       - aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
