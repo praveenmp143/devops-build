@@ -14,6 +14,7 @@ phases:
 
   pre_build:
     commands:
+<<<<<<< HEAD
       - echo "Setting environment variables..."
       - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - REGION=us-east-1
@@ -24,6 +25,15 @@ phases:
       - "aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
       - echo "Updating kubeconfig..."
       - "aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME"
+=======
+      - echo "Setting variables..."
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - REGION=us-east-1
+      - echo "ACCOUNT_ID = $ACCOUNT_ID"
+      - echo "REGION = $REGION"
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+>>>>>>> e84ac48 (pipeline commit)
 
   build:
     commands:
@@ -33,6 +43,7 @@ phases:
 
   post_build:
     commands:
+<<<<<<< HEAD
       - echo "Pushing Docker image..."
       - "docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPOSITORY:$IMAGE_TAG"
       - echo "Updating Kubernetes deployment..."
@@ -46,3 +57,13 @@ artifacts:
   files:
     - eks/deployment.yaml
     - eks/service.yaml
+=======
+      - echo "Pushing Docker image to ECR..."
+      - docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/devops-app:latest
+      - echo "Creating imagedefinitions.json..."
+      - printf '[{"name":"devops-app","imageUri":"%s"}]' $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/devops-app:latest > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
+>>>>>>> e84ac48 (pipeline commit)

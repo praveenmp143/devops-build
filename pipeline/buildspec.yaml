@@ -1,0 +1,35 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing dependencies...
+      - npm install   # or mvn install, go mod, etc.
+
+  pre_build:
+    commands:
+      - echo Running tests...
+      - npm test
+
+  build:
+    commands:
+      - echo Build started...
+      - npm run build
+      - echo Building Docker image...
+      - $(aws ecr get-login --no-include-email)
+      - docker build -t mind-app .
+      - docker tag myapp:latest $ECR_URI:latest
+
+  post_build:
+    commands:
+      - echo Pushing Docker image...
+      - docker push $ECR_URI:latest
+      - echo Writing imagedefinitions.json
+      - printf '[{"name":"myapp","imageUri":"%s"}]' $ECR_URI:latest > imagedefinitions.json
+
+artifacts:
+  files:
+    - appspec.yml
+    - imagedefinitions.json
+    - deployment/*
+    - scripts/*
